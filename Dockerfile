@@ -1,32 +1,22 @@
-FROM eclipse-temurin:20-jdk
+FROM eclipse-temurin:21-jdk
 
-ARG GRADLE_VERSION=8.2
+RUN apt-get update && apt-get install -yq make unzip
 
-# Установка unzip
-RUN apt-get update && apt-get install -yq unzip
+WORKDIR /backend
 
-# Скачивание и установка Gradle
-RUN wget -q https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
-    && unzip gradle-${GRADLE_VERSION}-bin.zip \
-    && rm gradle-${GRADLE_VERSION}-bin.zip
+COPY gradle gradle
+COPY build.gradle.kts .
+COPY settings.gradle.kts .
+COPY gradlew .
 
-# Установка переменной окружения для Gradle
-ENV GRADLE_HOME=/opt/gradle
+RUN ./gradlew --no-daemon dependencies
 
-# Перемещение установленного Gradle в указанную директорию
-RUN mv gradle-${GRADLE_VERSION} ${GRADLE_HOME}
+COPY lombok.config .
+COPY src src
 
-# Добавление Gradle в PATH
-ENV PATH=$PATH:$GRADLE_HOME/bin
+RUN ./gradlew --no-daemon build
 
-# Установка рабочей директории в корень проекта
-WORKDIR /app
+ENV JAVA_OPTS "-Xmx512M -Xms512M"
+EXPOSE 8080
 
-# Копирование всех файлов из корня проекта в контейнер
-COPY . .
-
-# Сборка проекта
-RUN gradle installDist
-
-# Команда для запуска приложения
-CMD ./build/install/app/bin/app
+CMD java -jar build/libs/HexletSpringBlog-1.0-SNAPSHOT.jar
