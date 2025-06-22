@@ -35,6 +35,28 @@ public class EncodersConfig {
     // Создается ниже
     private RsaKeyProperties rsaKeys;
 
+    /**
+     * Создаёт и возвращает бин {@link PasswordEncoder} для хеширования и проверки паролей.
+     *
+     * <p>Используется Spring Security для:
+     * <ul>
+     *   <li>Безопасного хранения паролей в БД (в захешированном виде)</li>
+     *   <li>Проверки введённых паролей при аутентификации</li>
+     * </ul>
+     *
+     * <p>В данной реализации используется {@link BCryptPasswordEncoder} — рекомендуемый алгоритм хеширования,
+     * который:
+     * <ul>
+     *   <li>Автоматически добавляет "соль" (salt) к каждому паролю</li>
+     *   <li>Поддерживает настраиваемую вычислительную сложность (strength)</li>
+     *   <li>Устойчив к атакам перебора (brute-force)</li>
+     * </ul>
+     * </p>
+     *
+     * @return бин кодировщика паролей ({@code BCryptPasswordEncoder} по умолчанию)
+     * @see BCryptPasswordEncoder
+     * @see PasswordEncoder
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
