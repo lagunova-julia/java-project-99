@@ -7,7 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserUtils {
+public final class UserUtils {
     @Autowired
     private UserRepository userRepository;
 

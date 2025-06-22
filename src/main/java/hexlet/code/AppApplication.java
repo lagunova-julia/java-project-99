@@ -9,12 +9,12 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @SpringBootApplication
 @EnableJpaAuditing
 public final class AppApplication {
-	public static void main(String[] args) {
-		SpringApplication.run(AppApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(AppApplication.class, args);
+    }
 
-	@Bean
-	public Faker faker() {
-		return new Faker();
-	}
+    @Bean
+    public Faker faker() {
+        return new Faker();
+    }
 }

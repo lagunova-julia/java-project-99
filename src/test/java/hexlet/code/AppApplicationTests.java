@@ -33,127 +33,127 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class AppApplicationTests {
-	@Autowired
-	private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-	@Autowired
-	private Faker faker;
+    @Autowired
+    private Faker faker;
 
-	@Autowired
-	private ObjectMapper om;
+    @Autowired
+    private ObjectMapper om;
 
-	@Autowired
-	private UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-	private User user;
+    private User user;
 
-	@BeforeEach
-	void setUp() {
-		user = Instancio.of(User.class)
-				.ignore(field(User::getId))
-				.set(field(User::getFirstName), "John")
-				.set(field(User::getLastName), "Doe")
-				.generate(field(User::getEmail), gen -> gen.net().email())
-				.supply(field(User::getPassword), () -> faker.internet().password())
-				.create();
-	}
+    @BeforeEach
+    void setUp() {
+        user = Instancio.of(User.class)
+                .ignore(field(User::getId))
+                .set(field(User::getFirstName), "John")
+                .set(field(User::getLastName), "Doe")
+                .generate(field(User::getEmail), gen -> gen.net().email())
+                .supply(field(User::getPassword), () -> faker.internet().password())
+                .create();
+    }
 
-	@Test
-	public void testWelcomePage() throws Exception {
-		var result = mockMvc.perform(get("/welcome").with(jwt()))
-				.andExpect(status().isOk())
-				.andReturn();
+    @Test
+    public void testWelcomePage() throws Exception {
+        var result = mockMvc.perform(get("/welcome").with(jwt()))
+                .andExpect(status().isOk())
+                .andReturn();
 
-		var body = result.getResponse().getContentAsString();
-		assertThat(body).contains("Welcome to Spring");
-	}
+        var body = result.getResponse().getContentAsString();
+        assertThat(body).contains("Welcome to Spring");
+    }
 
-	@Test
-	public void testIndex() throws Exception {
-		userRepository.save(user);
-		var result = mockMvc.perform(get("/api/users").with(jwt()))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.password").doesNotExist())
-				.andReturn();
+    @Test
+    public void testIndex() throws Exception {
+        userRepository.save(user);
+        var result = mockMvc.perform(get("/api/users").with(jwt()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.password").doesNotExist())
+                .andReturn();
 
-		var body = result.getResponse().getContentAsString();
-		assertThatJson(body).isArray();
-	}
+        var body = result.getResponse().getContentAsString();
+        assertThatJson(body).isArray();
+    }
 
-	@Test
-	public void testShow() throws Exception {
-		userRepository.save(user);
+    @Test
+    public void testShow() throws Exception {
+        userRepository.save(user);
 
-		var request = get("/api/users/{id}", user.getId()).with(jwt());
+        var request = get("/api/users/{id}", user.getId()).with(jwt());
 
-		var result = mockMvc.perform(request)
-				.andExpect(status().isOk())
-				.andReturn();
-		var body = result.getResponse().getContentAsString();
+        var result = mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andReturn();
+        var body = result.getResponse().getContentAsString();
 
-		assertThatJson(body).and(
-				v -> v.node("id").isNotNull(),
-				v -> v.node("email").isEqualTo(user.getEmail()),
-				v -> v.node("firstName").isEqualTo(user.getFirstName()),
-				v -> v.node("lastName").isEqualTo(user.getLastName()),
-				v -> v.node("createdAt").asString().matches("\\d{4}-\\d{2}-\\d{2}"),
-				v -> v.node("password").isAbsent()
-		);
-	}
+        assertThatJson(body).and(
+                v -> v.node("id").isNotNull(),
+                v -> v.node("email").isEqualTo(user.getEmail()),
+                v -> v.node("firstName").isEqualTo(user.getFirstName()),
+                v -> v.node("lastName").isEqualTo(user.getLastName()),
+                v -> v.node("createdAt").asString().matches("\\d{4}-\\d{2}-\\d{2}"),
+                v -> v.node("password").isAbsent()
+        );
+    }
 
-	@Test
-	public void testCreate() throws Exception {
-		var request = post("/api/users").with(jwt())
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(om.writeValueAsString(user));
+    @Test
+    public void testCreate() throws Exception {
+        var request = post("/api/users").with(jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(user));
 
-		mockMvc.perform(request)
-				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$.id", is(notNullValue())))
-				.andExpect(jsonPath("$.firstName", is(user.getFirstName())))
-				.andExpect(jsonPath("$.lastName", is(user.getLastName())))
-				.andExpect(jsonPath("$.email", is(user.getEmail())))
-				.andExpect(jsonPath("$.createdAt", notNullValue()))
-				.andExpect(jsonPath("$.createdAt", matchesRegex("\\d{4}-\\d{2}-\\d{2}")))
-				.andExpect(jsonPath("$.password").doesNotExist());
+        mockMvc.perform(request)
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", is(notNullValue())))
+                .andExpect(jsonPath("$.firstName", is(user.getFirstName())))
+                .andExpect(jsonPath("$.lastName", is(user.getLastName())))
+                .andExpect(jsonPath("$.email", is(user.getEmail())))
+                .andExpect(jsonPath("$.createdAt", notNullValue()))
+                .andExpect(jsonPath("$.createdAt", matchesRegex("\\d{4}-\\d{2}-\\d{2}")))
+                .andExpect(jsonPath("$.password").doesNotExist());
 
-		assertNotNull(userRepository.findByEmail(user.getEmail()));
-	}
+        assertNotNull(userRepository.findByEmail(user.getEmail()));
+    }
 
-	@Test
-	public void testUpdate() throws Exception {
-		userRepository.save(user);
+    @Test
+    public void testUpdate() throws Exception {
+        userRepository.save(user);
 
-		var data = new HashMap<>();
-		data.put("email", "john@yahoo.com");
-		data.put("password", "new-password");
+        var data = new HashMap<>();
+        data.put("email", "john@yahoo.com");
+        data.put("password", "new-password");
 
-		var request = put("/api/users/{id}", user.getId()).with(jwt())
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(om.writeValueAsString(data));
+        var request = put("/api/users/{id}", user.getId()).with(jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(data));
 
-		mockMvc.perform(request)
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id", is(notNullValue())))
-				.andExpect(jsonPath("$.firstName", is(user.getFirstName())))
-				.andExpect(jsonPath("$.lastName", is(user.getLastName())))
-				.andExpect(jsonPath("$.email", is("john@yahoo.com")))
-				.andExpect(jsonPath("$.createdAt", notNullValue()))
-				.andExpect(jsonPath("$.createdAt", matchesRegex("\\d{4}-\\d{2}-\\d{2}")))
-				.andExpect(jsonPath("$.password").doesNotExist());
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(notNullValue())))
+                .andExpect(jsonPath("$.firstName", is(user.getFirstName())))
+                .andExpect(jsonPath("$.lastName", is(user.getLastName())))
+                .andExpect(jsonPath("$.email", is("john@yahoo.com")))
+                .andExpect(jsonPath("$.createdAt", notNullValue()))
+                .andExpect(jsonPath("$.createdAt", matchesRegex("\\d{4}-\\d{2}-\\d{2}")))
+                .andExpect(jsonPath("$.password").doesNotExist());
 
-		User updatedUser = userRepository.findById(user.getId()).get();
+        User updatedUser = userRepository.findById(user.getId()).get();
 
-		assertThat(updatedUser.getEmail()).isEqualTo("john@yahoo.com");
-	}
+        assertThat(updatedUser.getEmail()).isEqualTo("john@yahoo.com");
+    }
 
-	@Test
-	public void testDelete() throws Exception {
-		userRepository.save(user);
+    @Test
+    public void testDelete() throws Exception {
+        userRepository.save(user);
 
-		mockMvc.perform(delete("/api/users/{id}", user.getId()).with(jwt()))
-				.andExpect(status().isNoContent());
+        mockMvc.perform(delete("/api/users/{id}", user.getId()).with(jwt()))
+                .andExpect(status().isNoContent());
 
-		assertThat(userRepository.findById(user.getId())).isEmpty();
-	}
+        assertThat(userRepository.findById(user.getId())).isEmpty();
+    }
 }
