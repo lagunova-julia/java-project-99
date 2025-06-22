@@ -85,16 +85,18 @@ public class SecurityConfig {
     /**
      * Создаёт провайдер аутентификации {@link DaoAuthenticationProvider}, который:
      * <ul>
-     *     <li>Использует {@link UserDetailsService} для загрузки пользователей из БД</li>
+     *     <li>Использует кастомную реализацию {@link CustomUserDetailsService} для загрузки пользователей</li>
      *     <li>Применяет {@link PasswordEncoder} для проверки паролей</li>
      * </ul>
      *
      * <p>Используется в {@link #authenticationManager(HttpSecurity)}.</p>
      *
+     * @param auth билдер {@link AuthenticationManagerBuilder}, используемый для настройки провайдера
      * @return бин {@link DaoAuthenticationProvider}
      * @see DaoAuthenticationProvider
-     * @see UserDetailsService
+     * @see CustomUserDetailsService
      * @see PasswordEncoder
+     * @see AuthenticationManagerBuilder
      */
     @Bean
     public AuthenticationProvider daoAuthProvider(AuthenticationManagerBuilder auth) {

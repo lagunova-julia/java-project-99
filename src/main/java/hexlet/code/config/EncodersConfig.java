@@ -17,6 +17,18 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
+/**
+ * Configuration class for password encoders.
+ *
+ * <p>This class is designed for extension. Subclasses should:
+ * <ul>
+ *   <li>Override {@link #passwordEncoder()} to provide custom encoder implementations</li>
+ *   <li>Ensure any overridden methods maintain the same security guarantees</li>
+ *   <li>Never weaken access modifiers of security-related methods</li>
+ * </ul>
+ *
+ * @see PasswordEncoder
+ */
 @Configuration
 public class EncodersConfig {
     @Autowired

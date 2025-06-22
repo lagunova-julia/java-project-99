@@ -15,7 +15,8 @@ public class JacksonConfig {
      * <p>Настройки включают:
      * <ul>
      *     <li>Исключение полей со значением {@code null} при сериализации ({@link JsonInclude.Include#NON_NULL})</li>
-     *     <li>Установку модуля {@link JsonNullableModule} для работы с {@code JsonNullable} (опциональные поля API)</li>
+     *     <li>Установку модуля {@link JsonNullableModule} для работы с {@code JsonNullable}
+     *     (опциональные поля API)</li>
      * </ul>
      * </p>
      *
