@@ -21,7 +21,7 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 @Configuration
 @EnableWebSecurity
-public final class SecurityConfig {
+public class SecurityConfig {
     @Autowired
     private JwtDecoder jwtDecoder;
 
@@ -31,6 +31,25 @@ public final class SecurityConfig {
     @Autowired
     private CustomUserDetailsService userService;
 
+    /**
+     * Определяет основную цепочку фильтров безопасности для HTTP-запросов.
+     * Настраивает политики аутентификации, авторизации, CORS, CSRF и другие.
+     *
+     * <p>Примеры настроек:
+     * <ul>
+     *     <li>Отключение CSRF для REST API</li>
+     *     <li>Ограничение доступа к эндпоинтам</li>
+     *     <li>Настройка JWT-аутентификации</li>
+     * </ul>
+     * </p>
+     *
+     * @param http          объект {@link HttpSecurity} для конфигурации
+     * @param introspector  {@link HandlerMappingIntrospector} для обработки путей запросов
+     * @return сконфигурированная цепочка фильтров {@link SecurityFilterChain}
+     * @throws Exception при ошибках конфигурации
+     * @see HttpSecurity
+     * @see SecurityFilterChain
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector)
             throws Exception {
@@ -46,12 +65,37 @@ public final class SecurityConfig {
                 .build();
     }
 
+    /**
+     * Создаёт и возвращает {@link AuthenticationManager}, используемый Spring Security
+     * для процесса аутентификации (например, при входе по логину/паролю или JWT).
+     *
+     * <p>Делегирует работу провайдеру аутентификации ({@link #daoAuthProvider()}).</p>
+     *
+     * @param http объект {@link HttpSecurity} для получения общего {@link AuthenticationManager}
+     * @return бин {@link AuthenticationManager}
+     * @see AuthenticationManager
+     * @see DaoAuthenticationProvider
+     */
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
                 .build();
     }
 
+    /**
+     * Создаёт провайдер аутентификации {@link DaoAuthenticationProvider}, который:
+     * <ul>
+     *     <li>Использует {@link UserDetailsService} для загрузки пользователей из БД</li>
+     *     <li>Применяет {@link PasswordEncoder} для проверки паролей</li>
+     * </ul>
+     *
+     * <p>Используется в {@link #authenticationManager(HttpSecurity)}.</p>
+     *
+     * @return бин {@link DaoAuthenticationProvider}
+     * @see DaoAuthenticationProvider
+     * @see UserDetailsService
+     * @see PasswordEncoder
+     */
     @Bean
     public AuthenticationProvider daoAuthProvider(AuthenticationManagerBuilder auth) {
         var provider = new DaoAuthenticationProvider();
