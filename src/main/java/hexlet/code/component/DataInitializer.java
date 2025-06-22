@@ -8,7 +8,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DataInitializer implements ApplicationRunner {
+public final class DataInitializer implements ApplicationRunner {
 
     @Autowired
     private UserRepository userRepository;

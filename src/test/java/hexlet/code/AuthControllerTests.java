@@ -19,7 +19,7 @@ public class AuthControllerTests {
     private MockMvc mockMvc;
 
     @Test
-    void getPrivateData_WithoutAuth() throws Exception {
+    void getPrivateDataWithoutAuth() throws Exception {
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isUnauthorized()); // 401
     }
@@ -27,7 +27,7 @@ public class AuthControllerTests {
     @Test
     @WithMockUser
         // Тест с мокнутой аутентификацией
-    void getPrivateData_WithAuth() throws Exception {
+    void getPrivateDataWithAuth() throws Exception {
         mockMvc.perform(get("/api/users").with(jwt()))
                 .andExpect(status().isOk());
     }
@@ -47,7 +47,7 @@ public class AuthControllerTests {
 
     @Test
     @WithMockUser
-    void getUser_ShouldNotExposePassword() throws Exception {
+    void getUserShouldNotExposePassword() throws Exception {
         mockMvc.perform(get("/api/users/1"))
                 .andExpect(jsonPath("$.password").doesNotExist());
     }

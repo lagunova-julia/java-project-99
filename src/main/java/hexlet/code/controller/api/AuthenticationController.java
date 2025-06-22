@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
-public class AuthenticationController {
+public final class AuthenticationController {
     @Autowired
     private JWTUtils jwtUtils;
 

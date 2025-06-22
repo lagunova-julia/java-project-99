@@ -30,7 +30,7 @@ import java.util.Collection;
 @Setter
 @EntityListeners(AuditingEntityListener.class)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class User implements UserDetails, BaseEntity {
+public final class User implements UserDetails, BaseEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private long id;

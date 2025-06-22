@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import hexlet.code.repository.UserRepository;
 
 @Service
-public class CustomUserDetailsService implements UserDetailsManager {
+public final class CustomUserDetailsService implements UserDetailsManager {
     @Autowired
     private UserRepository userRepository;
 
