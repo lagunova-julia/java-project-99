@@ -18,7 +18,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
 @Configuration
-public final class EncodersConfig {
+public class EncodersConfig {
     @Autowired
     // Создается ниже
     private RsaKeyProperties rsaKeys;
@@ -28,6 +28,16 @@ public final class EncodersConfig {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Создаёт и возвращает {@link JwtEncoder} для кодирования (подписи) JWT-токенов.
+     * Используется в процессах аутентификации (например, при выдаче токена после входа в систему).
+     *
+     * <p>Конфигурация кодировщика зависит от настроек приложения (алгоритм подписи, секретный ключ и т. д.).</p>
+     *
+     * @return бин {@link JwtEncoder}, готовый к использованию в Spring Security
+     * @see JwtEncoder
+     * @see org.springframework.security.oauth2.jwt.JwtEncoder
+     */
     @Bean
     JwtEncoder jwtEncoder() {
         JWK jwk = new RSAKey.Builder(rsaKeys.getPublicKey()).privateKey(rsaKeys.getPrivateKey()).build();
@@ -35,6 +45,22 @@ public final class EncodersConfig {
         return new NimbusJwtEncoder(jwks);
     }
 
+    /**
+     * Создаёт и возвращает {@link JwtDecoder} для декодирования и проверки JWT-токенов.
+     * Используется при проверке подлинности запросов (например, в {@link JwtAuthenticationFilter}).
+     *
+     * <p>Конфигурация декодировщика зависит от:
+     * <ul>
+     *     <li>Алгоритма подписи (HS256, RS256 и т. д.)</li>
+     *     <li>Публичного ключа (для RS*) или секретного ключа (для HS*)</li>
+     *     <li>Валидации claims (issuer, expiration и др.)</li>
+     * </ul>
+     * </p>
+     *
+     * @return бин {@link JwtDecoder}, готовый к использованию в Spring Security
+     * @see JwtDecoder
+     * @see org.springframework.security.oauth2.jwt.JwtDecoder
+     */
     @Bean
     JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder.withPublicKey(rsaKeys.getPublicKey()).build();
