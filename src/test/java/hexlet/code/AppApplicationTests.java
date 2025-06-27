@@ -14,7 +14,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
+import static hexlet.code.TestUtils.withMockJwt;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.matchesRegex;
@@ -70,11 +73,18 @@ class AppApplicationTests {
 
     @Test
     public void testIndex() throws Exception {
+        user.setRoles(Set.of("ADMIN"));
         userRepository.save(user);
-        var result = mockMvc.perform(get("/api/users").with(jwt()))
+
+        var result = mockMvc.perform(get("/api/users").with(withMockJwt(user)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.password").doesNotExist())
                 .andReturn();
+
+//        var result = mockMvc.perform(get("/api/users").with(jwt()))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.password").doesNotExist())
+//                .andReturn();
 
         var body = result.getResponse().getContentAsString();
         assertThatJson(body).isArray();
@@ -86,9 +96,18 @@ class AppApplicationTests {
 
         var request = get("/api/users/{id}", user.getId()).with(jwt());
 
-        var result = mockMvc.perform(request)
+//        var result = mockMvc.perform(request)
+//                .andExpect(status().isOk())
+//                .andReturn();
+
+        var result = mockMvc.perform(get("/api/users/{id}", user.getId())
+                        .with(jwt().jwt(jwt -> {
+                            jwt.claim("sub", user.getEmail());
+                            jwt.claim("authorities", List.of("ROLE_USER"));
+                        })))
                 .andExpect(status().isOk())
                 .andReturn();
+
         var body = result.getResponse().getContentAsString();
 
         assertThatJson(body).and(
