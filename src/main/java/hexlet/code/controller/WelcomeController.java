@@ -9,4 +9,9 @@ public final class WelcomeController {
     public String welcome() {
         return "Welcome to Spring";
     }
+
+    @GetMapping(path = "")
+    public String rootPage() {
+        return "Welcome to Spring";
+    }
 }

@@ -28,10 +28,8 @@ public class CustomUserDetailsService implements UserDetailsManager {
      */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // Нужно добавить в репозиторий findByEmail
-        var user = userRepository.findByEmail(email)
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        return user;
     }
 
     /**

@@ -1,15 +1,16 @@
 package hexlet.code.config;
 
+import hexlet.code.config.security.CustomJwtAuthenticationConverter;
 import hexlet.code.service.CustomUserDetailsService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-//import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -21,6 +22,7 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
     @Autowired
     private JwtDecoder jwtDecoder;
@@ -30,6 +32,9 @@ public class SecurityConfig {
 
     @Autowired
     private CustomUserDetailsService userService;
+
+    @Autowired
+    private CustomJwtAuthenticationConverter customJwtAuthenticationConverter;
 
     /**
      * Определяет основную цепочку фильтров безопасности для HTTP-запросов.
@@ -57,10 +62,19 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/login").permitAll()
-//                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                        .requestMatchers("/welcome").permitAll()
+                        .requestMatchers("/").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .oauth2ResourceServer((rs) -> rs.jwt((jwt) -> jwt.decoder(jwtDecoder)))
+                .oauth2ResourceServer((rs) -> rs
+                        .jwt((jwt) -> jwt
+                                .decoder(jwtDecoder)
+                                .jwtAuthenticationConverter(customJwtAuthenticationConverter)))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(((request, response, authException) -> response
+                                .sendError(HttpServletResponse.SC_UNAUTHORIZED)))
+                        .accessDeniedHandler(((request, response, accessDeniedException) -> response
+                                .sendError(HttpServletResponse.SC_FORBIDDEN))))
                 .httpBasic(Customizer.withDefaults())
                 .build();
     }
@@ -77,32 +91,16 @@ public class SecurityConfig {
      * @see DaoAuthenticationProvider
      */
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .build();
-    }
+    public AuthenticationManager authenticationManager(
+            HttpSecurity http,
+            PasswordEncoder passwordEncoder,
+            CustomUserDetailsService customUserDetailsService) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder
+                        .class);
+        authenticationManagerBuilder
+                .userDetailsService(customUserDetailsService)
+                .passwordEncoder(passwordEncoder);
 
-    /**
-     * Создаёт провайдер аутентификации {@link DaoAuthenticationProvider}, который:
-     * <ul>
-     *     <li>Использует кастомную реализацию {@link CustomUserDetailsService} для загрузки пользователей</li>
-     *     <li>Применяет {@link PasswordEncoder} для проверки паролей</li>
-     * </ul>
-     *
-     * <p>Используется в {@link #authenticationManager(HttpSecurity)}.</p>
-     *
-     * @param auth билдер {@link AuthenticationManagerBuilder}, используемый для настройки провайдера
-     * @return бин {@link DaoAuthenticationProvider}
-     * @see DaoAuthenticationProvider
-     * @see CustomUserDetailsService
-     * @see PasswordEncoder
-     * @see AuthenticationManagerBuilder
-     */
-    @Bean
-    public AuthenticationProvider daoAuthProvider(AuthenticationManagerBuilder auth) {
-        var provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userService);
-        provider.setPasswordEncoder(passwordEncoder);
-        return provider;
+        return authenticationManagerBuilder.build();
     }
 }
