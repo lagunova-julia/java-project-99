@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -66,6 +67,11 @@ public class SecurityConfig {
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/index.html").permitAll()
                         .requestMatchers("/assets/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/task_statuses",
+                                "/api/task_statuses/*").permitAll() //for show() and index() for now
+                        .requestMatchers(HttpMethod.POST, "/api/task_statuses/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/task_statuses/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/task_statuses/**").authenticated()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer((rs) -> rs

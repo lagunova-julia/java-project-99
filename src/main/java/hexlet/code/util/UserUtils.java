@@ -11,7 +11,6 @@ public final class UserUtils {
     @Autowired
     private UserRepository userRepository;
 
-    // BEGIN
     public User getCurrentUser() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -19,5 +18,10 @@ public final class UserUtils {
         }
         var email = authentication.getName();
         return userRepository.findByEmail(email).get();
+    }
+
+    public User getTestUser() {
+        return  userRepository.findByEmail("hexlet@example.com")
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }
