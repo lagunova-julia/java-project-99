@@ -6,6 +6,7 @@ import hexlet.code.dto.status.TaskStatusUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.model.TaskStatus;
+import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,8 @@ public class TaskStatusService {
 
     @Autowired
     private TaskStatusMapper statusMapper;
+    @Autowired
+    private TaskRepository taskRepository;
 
     public List<TaskStatusDTO> getAll() {
         log.info("Fetching all task statuses");
@@ -39,7 +42,7 @@ public class TaskStatusService {
         var taskStatus = statusMapper.map(statusData);
 //        taskStatus.setRoles(Set.of("ROLE_USER"));
         statusRepository.save(taskStatus);
-        log.info("Delete successful for data={}", statusData);
+        log.info("Create successful for data={}", statusData);
         return statusMapper.map(taskStatus);
     }
 
@@ -67,7 +70,13 @@ public class TaskStatusService {
     public void delete(Long id) throws ResponseStatusException {
         log.info("Delete called with id={}", id);
         TaskStatus taskStatus = statusRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task status " + id + " not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Task status " + id + " not found"));
+
+        if (taskRepository.existsByTaskStatusId(id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "You cannot delete this status because it connects with tasks");
+        }
 
         statusRepository.deleteById(id);
         log.info("Delete successful for id={}", id);

@@ -6,6 +6,7 @@ import hexlet.code.dto.user.UserUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.UserMapper;
 import hexlet.code.model.User;
+import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.util.UserUtils;
 import jakarta.validation.Valid;
@@ -53,6 +54,9 @@ public class UserController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private TaskRepository taskRepository;
 
     /**
      * Возвращает список всех пользователей.
@@ -151,6 +155,11 @@ public class UserController {
     public void delete(@PathVariable Long id) throws ResponseStatusException {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User " + id + " not found"));
+
+        if (taskRepository.existsByAssigneeId(id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "You cannot delete this user because he connects with tasks");
+        }
 
         userRepository.deleteById(id);
     }
