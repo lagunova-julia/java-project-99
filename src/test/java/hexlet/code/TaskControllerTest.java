@@ -6,6 +6,7 @@ import hexlet.code.mapper.TaskMapper;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
+import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
@@ -25,6 +26,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,6 +36,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -66,6 +69,9 @@ public class TaskControllerTest {
     @Autowired
     private TaskStatusRepository statusRepository;
 
+    @Autowired
+    private LabelRepository labelRepository;
+
     private Task testTask;
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
@@ -95,6 +101,44 @@ public class TaskControllerTest {
 
         var body = result.getResponse().getContentAsString();
         assertThatJson(body).isArray();
+    }
+
+    @Test
+    void getAllFilteredTasks() throws Exception {
+
+        // Основной пользователь и статус — уже сохранены в @BeforeEach
+        var assignee = testTask.getAssignee();
+        var status = testTask.getTaskStatus();
+
+        // Сохраняем метку
+        var label = labelRepository.save(Instancio.of(modelGenerator.getLabelModel()).create());
+
+        // Привязываем метку к задаче
+        testTask.setLabels(Set.of(label));
+        testTask.setName("Fix backend bug"); // чтобы тест по titleCont сработал
+        taskRepository.save(testTask);
+
+        // Создаём отвлекающую задачу — не должна попасть в результаты
+        var otherTask = Instancio.of(modelGenerator.getTaskModel()).create();
+        otherTask.setName("Something else");
+        otherTask.setAssignee(null);
+        otherTask.setLabels(Set.of());
+        otherTask.setTaskStatus(status);
+        taskRepository.save(otherTask);
+
+        // Act
+        mockMvc.perform(get("/api/tasks")
+                        .param("titleCont", "backend")
+                        .param("assigneeId", String.valueOf(assignee.getId()))
+                        .param("status", status.getSlug())
+                        .param("labelId", String.valueOf(label.getId()))
+                        .with(token))
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].title").value("Fix backend bug"))
+                .andExpect(jsonPath("$[0].assignee_id").value(assignee.getId()))
+                .andExpect(jsonPath("$[0].status").value(status.getSlug()));
     }
 
     @Test

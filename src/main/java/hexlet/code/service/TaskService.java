@@ -2,6 +2,7 @@ package hexlet.code.service;
 
 import hexlet.code.dto.task.TaskCreateDTO;
 import hexlet.code.dto.task.TaskDTO;
+import hexlet.code.dto.task.TaskParamsDTO;
 import hexlet.code.dto.task.TaskUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskMapper;
@@ -13,11 +14,14 @@ import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
+import hexlet.code.specification.TaskSpecification;
 import hexlet.code.util.UserUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashSet;
@@ -42,14 +46,23 @@ public class TaskService {
     @Autowired
     private UserUtils userUtils;
 
-    public List<TaskDTO> getAll() {
+    @Autowired
+    private TaskSpecification specBuilder;
+
+    public List<TaskDTO> getAll(TaskParamsDTO params, @RequestParam(defaultValue = "1") int page) {
         log.info("Fetching all tasks");
-        var tasks = taskRepository.findAll();
+        var specification = specBuilder.build(params);
+        var tasks = taskRepository.findAll(specification, PageRequest.of(page - 1, 10));
         var result = tasks.stream()
                 .map(taskMapper::map)
                 .toList();
         log.info("Found {} tasks", result.size());
         return result;
+    }
+
+    public Long getTotalCount(TaskParamsDTO params) {
+        var spec = specBuilder.build(params);
+        return taskRepository.count(spec);
     }
 
     public TaskDTO create(TaskCreateDTO taskData) {

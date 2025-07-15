@@ -2,6 +2,7 @@ package hexlet.code.controller.api;
 
 import hexlet.code.dto.task.TaskCreateDTO;
 import hexlet.code.dto.task.TaskDTO;
+import hexlet.code.dto.task.TaskParamsDTO;
 import hexlet.code.dto.task.TaskUpdateDTO;
 import hexlet.code.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -34,12 +36,21 @@ public class TaskController {
 
     @GetMapping(path = "")
     @Operation(summary = "Get all tasks")
-    public ResponseEntity<List<TaskDTO>> index() {
-        var statuses = taskService.getAll();
+    public ResponseEntity<List<TaskDTO>> index(
+            @RequestParam(required = false) String titleCont,
+            @RequestParam(required = false) Long assigneeId,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long labelId,
+            @RequestParam(defaultValue = "1") int page)
+    {
+        var params = new TaskParamsDTO(titleCont, assigneeId, status, labelId);
+        var tasks = taskService.getAll(params, page);
+
+        Long totalCount = taskService.getTotalCount(params);
 
         return ResponseEntity.ok()
-                .header("X-Total-Count", String.valueOf(statuses.size()))
-                .body(statuses);
+                .header("X-Total-Count", String.valueOf(totalCount))
+                .body(tasks);
     }
 
     @PostMapping(path = "")
