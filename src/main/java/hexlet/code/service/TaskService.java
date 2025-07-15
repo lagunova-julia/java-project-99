@@ -1,16 +1,15 @@
 package hexlet.code.service;
 
-import hexlet.code.dto.status.TaskStatusCreateDTO;
-import hexlet.code.dto.status.TaskStatusDTO;
-import hexlet.code.dto.status.TaskStatusUpdateDTO;
 import hexlet.code.dto.task.TaskCreateDTO;
 import hexlet.code.dto.task.TaskDTO;
 import hexlet.code.dto.task.TaskUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskMapper;
+import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
+import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
@@ -21,7 +20,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Slf4j
 @Service
@@ -32,6 +35,8 @@ public class TaskService {
     private TaskMapper taskMapper;
     @Autowired
     private TaskStatusRepository statusRepository;
+    @Autowired
+    private LabelRepository labelRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -52,6 +57,14 @@ public class TaskService {
         TaskStatus status = statusRepository.findBySlug(taskData.getStatus())
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Task status not found: " + taskData.getStatus()));
+        Set<Label> labels = new HashSet<>();
+        if (taskData.getLabelIds() != null && !taskData.getLabelIds().isEmpty()) {
+            labels = new HashSet<>(labelRepository.findAllById(taskData.getLabelIds()));
+            // Проверка: все ли переданные ID найдены
+            if (labels.size() != taskData.getLabelIds().size()) {
+                throw new ResponseStatusException(BAD_REQUEST, "Some label IDs not found");
+            }
+        }
 
         User assignee = null;
         if (taskData.getAssignee_id() != null) {
@@ -63,6 +76,7 @@ public class TaskService {
         Task task = taskMapper.map(taskData);
         task.setTaskStatus(status);
         task.setAssignee(assignee);
+        task.setLabels(labels);
 //        task.setRoles(Set.of("ROLE_USER"));
         Task saved = taskRepository.save(task);
         log.info("Create successful for data={}", taskData);
@@ -82,6 +96,11 @@ public class TaskService {
         log.info("Update called with id={}, data={}", id, taskData);
         var task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task " + id + " not found"));
+        if (taskData.getLabelIds() != null && taskData.getLabelIds().isPresent()) {
+            var labelIds = taskData.getLabelIds().get();
+            var labels = labelRepository.findAllById(labelIds);
+            task.setLabels(new HashSet<>(labels));
+        }
 
         taskMapper.update(taskData, task);
         taskRepository.save(task);

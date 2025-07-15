@@ -58,7 +58,8 @@ public class TaskStatusService {
     public TaskStatusDTO update(TaskStatusUpdateDTO statusData, Long id) {
         log.info("Update called with id={}, data={}", id, statusData);
         var status = statusRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task status " + id + " not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Task status " + id + " not found"));
 
         statusMapper.update(statusData, status);
         statusRepository.save(status);

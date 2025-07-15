@@ -1,21 +1,29 @@
 package hexlet.code;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.model.Task;
+import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
+import hexlet.code.repository.TaskRepository;
+import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
+import hexlet.code.util.ModelGenerator;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
+import org.instancio.Select;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static hexlet.code.TestUtils.withMockJwt;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -48,7 +56,17 @@ class AppApplicationTests {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private TaskStatusRepository statusRepository;
+
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private ModelGenerator modelGenerator;
+
     private User user;
+    private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
 
     @BeforeEach
     void setUp() {
@@ -174,5 +192,25 @@ class AppApplicationTests {
                 .andExpect(status().isNoContent());
 
         assertThat(userRepository.findById(user.getId())).isEmpty();
+    }
+
+    @Test
+    public void testDestroyWithExistingTask() throws Exception {
+        User user = userRepository.save(Instancio.of(modelGenerator.getUserModel()).create());
+
+        TaskStatus status = statusRepository.save(Instancio.of(modelGenerator.getStatusModel())
+                .supply(Select.field(TaskStatus::getSlug), () -> UUID.randomUUID().toString())
+                .create());
+
+        Task task = new Task();
+        task.setName("Test task");
+        task.setTaskStatus(status);
+        task.setAssignee(user);
+        taskRepository.save(task);
+
+        var request = delete("/api/users/{id}", user.getId()).with(token);
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest());
     }
 }

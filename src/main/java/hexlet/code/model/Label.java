@@ -5,14 +5,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -35,39 +30,20 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @EntityListeners(AuditingEntityListener.class)
 @ToString(includeFieldNames = true, onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Table(name = "tasks")
-public class Task implements BaseEntity {
+@Table(name = "labels")
+public class Label implements BaseEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     @NotBlank
-    @Size(min = 1)
+    @Size(min = 3, max = 1000)
     @Column(unique = true)
     private String name;
-
-    @Min(value = 0, message = "Индекс не может быть отрицательным")
-    private int index;
-
-    private String description;
-
-    @NotNull(message = "Статус задачи обязателен")
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "task_status_id", nullable = false)
-    private TaskStatus taskStatus;
-
-    @ManyToOne
-    @JoinColumn(name = "assignee_id", nullable = true)
-    private User assignee;
 
     @CreatedDate
     private Timestamp createdAt;
 
-    @ManyToMany
-    @JoinTable(
-            name = "task_labels",
-            joinColumns = @JoinColumn(name = "task_id"),
-            inverseJoinColumns = @JoinColumn(name = "label_id")
-    )
-    private Set<Label> labels = new HashSet<>();
+    @ManyToMany(mappedBy = "labels")
+    private Set<Task> tasks = new HashSet<>();
 }
