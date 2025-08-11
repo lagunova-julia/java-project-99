@@ -4,9 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.label.LabelUpdateDTO;
 import hexlet.code.mapper.LabelMapper;
 import hexlet.code.model.Label;
-import hexlet.code.model.Task;
-import hexlet.code.model.TaskStatus;
-import hexlet.code.model.User;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
@@ -28,10 +25,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Set;
+import java.util.UUID;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.instancio.Select.field;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -87,8 +85,9 @@ public class LabelControllerTest {
                 .defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
                 .apply(springSecurity())
                 .build();
-        testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
-//        testStatus.setAuthor(userUtils.getTestUser());
+        testLabel = Instancio.of(modelGenerator.getLabelModel())
+                .set(field(Label::getName), "label_" + UUID.randomUUID()
+                        .toString().substring(0, 8)).create();
         token = jwt().jwt(builder -> builder.subject(userUtils.getTestUser().getEmail()));
     }
 
@@ -134,7 +133,6 @@ public class LabelControllerTest {
 
         assertThat(label).isNotNull();
         assertThat(label.getName()).isEqualTo(testLabel.getName());
-//        assertThat(task.getAuthor().getId()).isEqualTo(testArticle.getAuthor().getId());
     }
 
     @Test
@@ -169,30 +167,8 @@ public class LabelControllerTest {
         assertThat(labelRepository.existsById(testLabel.getId())).isFalse();
     }
 
-//    @Test
-//    public void testDestroyWithExistingTask() throws Exception { //из-за этого теста падали остальные...
-//        labelRepository.save(testLabel);
-//
-//        Task task = Instancio.of(modelGenerator.getTaskModel()).create();
-//        User user = Instancio.of(modelGenerator.getUserModel()).create();
-//        userRepository.save(user);
-//        TaskStatus taskStatus = Instancio.of(modelGenerator.getStatusModel()).create();
-//        statusRepository.save(taskStatus);
-//        task.setAssignee(user);
-//        task.setTaskStatus(taskStatus);
-//        task.setLabels(Set.of(testLabel));
-//        taskRepository.save(task);
-//
-//        var request = delete("/api/labels/{id}", testLabel.getId()).with(token);
-//        mockMvc.perform(request)
-//                .andExpect(status().isBadRequest());
-//
-//        assertThat(labelRepository.existsById(testLabel.getId())).isTrue();
-//    }
-
     @Test
     public void testIndexWithoutAuth() throws Exception {
-
         mockMvc.perform(get("/api/labels"))
                 .andExpect(status().isUnauthorized());
     }

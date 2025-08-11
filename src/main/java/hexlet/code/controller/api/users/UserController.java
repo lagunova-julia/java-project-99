@@ -8,6 +8,7 @@ import hexlet.code.mapper.UserMapper;
 import hexlet.code.model.User;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.UserRepository;
+import hexlet.code.service.UserService;
 import hexlet.code.util.UserUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,21 +43,8 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
-
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
-    private UserUtils userUtils;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private TaskRepository taskRepository;
+    private UserService userService;
 
     /**
      * Возвращает список всех пользователей.
@@ -66,18 +54,14 @@ public class UserController {
      * @throws AccessDeniedException если у текущего пользователя нет прав ADMIN
      */
     @GetMapping(path = "")
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserDTO>> index() {
-        var users = userRepository.findAll();
-
-        var usersDTOs = users.stream()
-                .map(userMapper::map)
-                .toList();
+        var users = userService.getAll();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(usersDTOs.size()));
+        headers.add("X-Total-Count", String.valueOf(users.size()));
 
-        return new ResponseEntity<>(usersDTOs,headers, HttpStatus.OK);
+        return new ResponseEntity<>(users,headers, HttpStatus.OK);
     }
 
     /**
@@ -92,11 +76,7 @@ public class UserController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDTO create(@Valid @RequestBody UserCreateDTO userData) {
-        var user = userMapper.map(userData);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRoles(Set.of("ROLE_USER"));
-        userRepository.save(user);
-        return userMapper.map(user);
+        return userService.create(userData);
     }
 
     /**
@@ -112,10 +92,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') or #id == principal.id")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO show(@PathVariable Long id) {
-        var user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Not Found: " + id));
-
-        return userMapper.map(user);
+        return userService.show(id);
     }
 
     /**
@@ -133,12 +110,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') or #id == principal.id")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO update(@RequestBody @Valid UserUpdateDTO userData, @PathVariable Long id) {
-        var user = userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User " + id + " not found"));
-
-        userMapper.update(userData, user);
-        userRepository.save(user);
-        return userMapper.map(user);
+        return userService.update(userData, id);
     }
 
     /**
@@ -153,14 +125,6 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') or #id == principal.id")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) throws ResponseStatusException {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User " + id + " not found"));
-
-        if (taskRepository.existsByAssigneeId(id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "You cannot delete this user because he connects with tasks");
-        }
-
-        userRepository.deleteById(id);
+        userService.delete(id);
     }
 }

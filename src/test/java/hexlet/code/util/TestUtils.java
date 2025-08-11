@@ -1,4 +1,4 @@
-package hexlet.code;
+package hexlet.code.util;
 
 import hexlet.code.model.User;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

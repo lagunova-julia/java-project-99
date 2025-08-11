@@ -3,6 +3,7 @@ package hexlet.code;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.task.TaskUpdateDTO;
 import hexlet.code.mapper.TaskMapper;
+import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
@@ -27,9 +28,11 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
+import java.util.UUID;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.instancio.Select.field;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -78,17 +81,19 @@ public class TaskControllerTest {
 
     @BeforeEach
     public void setUp() {
-        taskRepository.deleteAll();
         mockMvc = MockMvcBuilders.webAppContextSetup(wac)
                 .defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
                 .apply(springSecurity())
                 .build();
         testTask = Instancio.of(modelGenerator.getTaskModel()).create();
         User testUser = userRepository.save(Instancio.of(modelGenerator.getUserModel()).create());
-        TaskStatus testStatus = statusRepository.save(Instancio.of(modelGenerator.getStatusModel()).create());
-//        testTask.setAssignee(userUtils.getTestUser());
+        TaskStatus testStatus = statusRepository.save(Instancio.of(modelGenerator.getStatusModel())
+                .set(field(TaskStatus::getName), "test_status_" + UUID.randomUUID()
+                        .toString().substring(0, 8)).create());
+        Label testLabel = labelRepository.save(Instancio.of(modelGenerator.getLabelModel()).create());
         testTask.setTaskStatus(testStatus);
         testTask.setAssignee(testUser);
+        testTask.setLabels(Set.of(testLabel));
         token = jwt().jwt(builder -> builder.subject(userUtils.getTestUser().getEmail()));
     }
 
@@ -105,20 +110,15 @@ public class TaskControllerTest {
 
     @Test
     void getAllFilteredTasks() throws Exception {
-
-        // Основной пользователь и статус — уже сохранены в @BeforeEach
         var assignee = testTask.getAssignee();
         var status = testTask.getTaskStatus();
 
-        // Сохраняем метку
         var label = labelRepository.save(Instancio.of(modelGenerator.getLabelModel()).create());
 
-        // Привязываем метку к задаче
         testTask.setLabels(Set.of(label));
-        testTask.setName("Fix backend bug"); // чтобы тест по titleCont сработал
+        testTask.setName("Fix backend bug");
         taskRepository.save(testTask);
 
-        // Создаём отвлекающую задачу — не должна попасть в результаты
         var otherTask = Instancio.of(modelGenerator.getTaskModel()).create();
         otherTask.setName("Something else");
         otherTask.setAssignee(null);
@@ -126,14 +126,12 @@ public class TaskControllerTest {
         otherTask.setTaskStatus(status);
         taskRepository.save(otherTask);
 
-        // Act
         mockMvc.perform(get("/api/tasks")
                         .param("titleCont", "backend")
                         .param("assigneeId", String.valueOf(assignee.getId()))
                         .param("status", status.getSlug())
                         .param("labelId", String.valueOf(label.getId()))
                         .with(token))
-                // Assert
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].title").value("Fix backend bug"))
@@ -181,7 +179,6 @@ public class TaskControllerTest {
         assertThat(task.getAssignee()).isEqualTo(testTask.getAssignee());
         assertThat(task.getDescription()).isEqualTo(testTask.getDescription());
         assertThat(task.getTaskStatus()).isEqualTo(testTask.getTaskStatus());
-//        assertThat(task.getAuthor().getId()).isEqualTo(testArticle.getAuthor().getId());
     }
 
     @Test

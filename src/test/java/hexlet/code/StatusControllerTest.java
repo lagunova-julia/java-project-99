@@ -5,10 +5,8 @@ import hexlet.code.dto.status.TaskStatusUpdateDTO;
 import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
-import hexlet.code.model.User;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
-import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
 import hexlet.code.util.UserUtils;
 import net.datafaker.Faker;
@@ -29,14 +27,12 @@ import java.nio.charset.StandardCharsets;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -75,13 +71,11 @@ public class StatusControllerTest {
 
     @BeforeEach
     public void setUp() {
-        statusRepository.deleteAll();
         mockMvc = MockMvcBuilders.webAppContextSetup(wac)
                 .defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
                 .apply(springSecurity())
                 .build();
         testStatus = Instancio.of(modelGenerator.getStatusModel()).create();
-//        testStatus.setAuthor(userUtils.getTestUser());
         token = jwt().jwt(builder -> builder.subject(userUtils.getTestUser().getEmail()));
     }
 
@@ -130,7 +124,6 @@ public class StatusControllerTest {
         assertThat(status).isNotNull();
         assertThat(status.getName()).isEqualTo(testStatus.getName());
         assertThat(status.getSlug()).isEqualTo(testStatus.getSlug());
-//        assertThat(task.getAuthor().getId()).isEqualTo(testArticle.getAuthor().getId());
     }
 
     @Test
