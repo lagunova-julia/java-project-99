@@ -19,24 +19,19 @@ public class AppApplication {
     }
 
     /**
-     * Создаёт и возвращает бин {@link Faker} — библиотеку для генерации фейковых данных
-     * (например, имён, адресов, телефонных номеров).
-     *
-     * <p>Использование:
-     * <pre>{@code
-     * faker.name().fullName(); // "John Doe"
-     * faker.address().city();  // "New York"
-     * }</pre>
-     * </p>
-     *
-     * @return экземпляр {@link Faker}, готовый к использованию
-     * @see Faker
+     * Создает экземпляр Faker для генерации тестовых данных.
+     * @return экземпляр Faker
      */
     @Bean
     public Faker faker() {
         return new Faker();
     }
 
+    /**
+     * Инициализирует стандартные статусы задач при старте приложения.
+     * @param repository репозиторий статусов задач
+     * @return CommandLineRunner для выполнения инициализации
+     */
     @Bean
     public CommandLineRunner initDefaultStatuses(TaskStatusRepository repository) {
         return args -> {

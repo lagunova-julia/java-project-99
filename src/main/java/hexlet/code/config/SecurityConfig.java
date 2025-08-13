@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -25,36 +24,27 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+    /** Декодер JWT-токенов. */
     @Autowired
     private JwtDecoder jwtDecoder;
 
+    /** Кодировщик паролей. */
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    /** Сервис пользовательских данных. */
     @Autowired
     private CustomUserDetailsService userService;
 
+    /** Конвертер аутентификации JWT. */
     @Autowired
     private CustomJwtAuthenticationConverter customJwtAuthenticationConverter;
 
     /**
-     * Определяет основную цепочку фильтров безопасности для HTTP-запросов.
-     * Настраивает политики аутентификации, авторизации, CORS, CSRF и другие.
-     *
-     * <p>Примеры настроек:
-     * <ul>
-     *     <li>Отключение CSRF для REST API</li>
-     *     <li>Ограничение доступа к эндпоинтам</li>
-     *     <li>Настройка JWT-аутентификации</li>
-     * </ul>
-     * </p>
-     *
-     * @param http          объект {@link HttpSecurity} для конфигурации
-     * @param introspector  {@link HandlerMappingIntrospector} для обработки путей запросов
-     * @return сконфигурированная цепочка фильтров {@link SecurityFilterChain}
-     * @throws Exception при ошибках конфигурации
-     * @see HttpSecurity
-     * @see SecurityFilterChain
+     * Настраивает цепочку безопасности.
+     * @param http объект конфигурации
+     * @param introspector обработчик путей
+     * @return цепочка фильтров
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector)
@@ -72,7 +62,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/tasks/**").authenticated()
                         .requestMatchers("/api/labels").authenticated()
                         .requestMatchers("/api/labels/**").authenticated()
-                        .requestMatchers(HttpMethod.GET,"/api/task_statuses",
+                        .requestMatchers(HttpMethod.GET, "/api/task_statuses",
                                 "/api/task_statuses/*").permitAll() //for show() and index() for now
                         .requestMatchers(HttpMethod.POST, "/api/task_statuses/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/task_statuses/**").authenticated()
@@ -93,15 +83,12 @@ public class SecurityConfig {
     }
 
     /**
-     * Создаёт и возвращает {@link AuthenticationManager}, используемый Spring Security
-     * для процесса аутентификации (например, при входе по логину/паролю или JWT).
-     *
-     * <p>Делегирует работу провайдеру аутентификации ({@link #daoAuthProvider()}).</p>
-     *
-     * @param http объект {@link HttpSecurity} для получения общего {@link AuthenticationManager}
-     * @return бин {@link AuthenticationManager}
-     * @see AuthenticationManager
-     * @see DaoAuthenticationProvider
+     * Создает менеджер аутентификации.
+     * @param http конфигурация безопасности
+     * @param passwordEncoder кодировщик паролей
+     * @param customUserDetailsService сервис пользовательских данных
+     * @return менеджер аутентификации
+     * @throws Exception при ошибках создания
      */
     @Bean
     public AuthenticationManager authenticationManager(
