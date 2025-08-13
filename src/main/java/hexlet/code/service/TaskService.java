@@ -30,6 +30,9 @@ import java.util.Set;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
+/**
+ * Сервис для управления задачами.
+ */
 @Slf4j
 @Service
 public class TaskService {
@@ -49,6 +52,10 @@ public class TaskService {
     @Autowired
     private TaskSpecification specBuilder;
 
+    /**
+     * Возвращает все задачи.
+     * @return список задач
+     */
     public List<TaskDTO> getAll(TaskParamsDTO params, @RequestParam(defaultValue = "1") int page) {
         log.info("Fetching all tasks");
         var specification = specBuilder.build(params);
@@ -60,11 +67,20 @@ public class TaskService {
         return result;
     }
 
+    /**
+     * Возвращает общее количество задач.
+     * @return количество задач
+     */
     public Long getTotalCount(TaskParamsDTO params) {
         var spec = specBuilder.build(params);
         return taskRepository.count(spec);
     }
 
+    /**
+     * Создает новую задачу.
+     * @param taskData данные задачи
+     * @return созданная задача
+     */
     public TaskDTO create(TaskCreateDTO taskData) {
         log.info("Create called with data={}", taskData);
         TaskStatus status = statusRepository.findBySlug(taskData.getStatus())
@@ -80,10 +96,10 @@ public class TaskService {
         }
 
         User assignee = null;
-        if (taskData.getAssignee_id() != null) {
-            assignee = userRepository.findById(taskData.getAssignee_id())
+        if (taskData.getAssigneeId() != null) {
+            assignee = userRepository.findById(taskData.getAssigneeId())
                     .orElseThrow(() -> new ResponseStatusException(
-                            HttpStatus.NOT_FOUND, "User not found: " + taskData.getAssignee_id()));
+                            HttpStatus.NOT_FOUND, "User not found: " + taskData.getAssigneeId()));
         }
 
         Task task = taskMapper.map(taskData);
@@ -96,6 +112,11 @@ public class TaskService {
         return taskMapper.map(saved);
     }
 
+    /**
+     * Находит задачу по ID.
+     * @param id идентификатор задачи
+     * @return найденная задача
+     */
     public TaskDTO findById(Long id) {
         log.info("findById called with id={}", id);
         var task = taskRepository.findById(id)
@@ -105,6 +126,12 @@ public class TaskService {
         return taskMapper.map(task);
     }
 
+    /**
+     * Обновляет задачу.
+     * @param id идентификатор задачи
+     * @param taskData новые данные
+     * @return обновленная задача
+     */
     public TaskDTO update(TaskUpdateDTO taskData, Long id) {
         log.info("Update called with id={}, data={}", id, taskData);
         var task = taskRepository.findById(id)
@@ -122,6 +149,10 @@ public class TaskService {
         return taskMapper.map(task);
     }
 
+    /**
+     * Удаляет задачу.
+     * @param id идентификатор задачи
+     */
     public void delete(Long id) throws ResponseStatusException {
         log.info("Delete called with id={}", id);
         Task task = taskRepository.findById(id)

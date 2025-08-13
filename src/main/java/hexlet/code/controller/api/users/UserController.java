@@ -4,19 +4,13 @@ import hexlet.code.dto.user.UserCreateDTO;
 import hexlet.code.dto.user.UserDTO;
 import hexlet.code.dto.user.UserUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
-import hexlet.code.mapper.UserMapper;
-import hexlet.code.model.User;
-import hexlet.code.repository.TaskRepository;
-import hexlet.code.repository.UserRepository;
 import hexlet.code.service.UserService;
-import hexlet.code.util.UserUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Контроллер для управления пользователями.
@@ -61,7 +54,7 @@ public class UserController {
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Total-Count", String.valueOf(users.size()));
 
-        return new ResponseEntity<>(users,headers, HttpStatus.OK);
+        return new ResponseEntity<>(users, headers, HttpStatus.OK);
     }
 
     /**

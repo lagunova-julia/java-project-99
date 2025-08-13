@@ -34,7 +34,7 @@ public final class DataInitializer implements ApplicationRunner {
     }
 
     private void initAdmin() {
-        if(userRepository.findByEmail("hexlet@example.com").isEmpty()) {
+        if (userRepository.findByEmail("hexlet@example.com").isEmpty()) {
             User user = new User();
             user.setEmail("hexlet@example.com");
             user.setPassword(passwordEncoder.encode("qwerty"));
@@ -45,8 +45,8 @@ public final class DataInitializer implements ApplicationRunner {
     }
 
     private void initLabels() {
-        for(var name : DEFAULT_LABELS) {
-            if(labelRepository.findByName(name).isEmpty()) {
+        for (var name : DEFAULT_LABELS) {
+            if (labelRepository.findByName(name).isEmpty()) {
                 var label = new Label();
                 label.setName(name);
                 labelRepository.save(label);

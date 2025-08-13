@@ -26,6 +26,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+/**
+ * Контроллер для работы с задачами.
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/tasks")
@@ -34,6 +37,15 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
+    /**
+     * Возвращает список задач с возможностью фильтрации.
+     * @param titleCont фильтр по части названия (опционально)
+     * @param assigneeId фильтр по ID исполнителя (опционально)
+     * @param status фильтр по статусу (опционально)
+     * @param labelId фильтр по ID метки (опционально)
+     * @param page номер страницы (по умолчанию 1)
+     * @return список задач с пагинацией
+     */
     @GetMapping(path = "")
     @Operation(summary = "Get all tasks")
     public ResponseEntity<List<TaskDTO>> index(
@@ -41,8 +53,7 @@ public class TaskController {
             @RequestParam(required = false) Long assigneeId,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Long labelId,
-            @RequestParam(defaultValue = "1") int page)
-    {
+            @RequestParam(defaultValue = "1") int page) {
         var params = new TaskParamsDTO(titleCont, assigneeId, status, labelId);
         var tasks = taskService.getAll(params, page);
 
@@ -53,6 +64,11 @@ public class TaskController {
                 .body(tasks);
     }
 
+    /**
+     * Создает новую задачу.
+     * @param taskData данные задачи
+     * @return созданная задача
+     */
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public TaskDTO create(@Valid @RequestBody TaskCreateDTO taskData) {
@@ -60,12 +76,23 @@ public class TaskController {
         return taskService.create(taskData);
     }
 
+    /**
+     * Возвращает задачу по ID.
+     * @param id идентификатор задачи
+     * @return найденная задача
+     */
     @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public TaskDTO show(@PathVariable Long id) {
         return taskService.findById(id);
     }
 
+    /**
+     * Обновляет задачу.
+     * @param id идентификатор задачи
+     * @param taskData новые данные
+     * @return обновленная задача
+     */
     @PutMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public TaskDTO update(@RequestBody @Valid TaskUpdateDTO taskData, @PathVariable Long id) {
@@ -73,6 +100,10 @@ public class TaskController {
         return taskService.update(taskData, id);
     }
 
+    /**
+     * Удаляет задачу.
+     * @param id идентификатор задачи
+     */
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) throws ResponseStatusException {

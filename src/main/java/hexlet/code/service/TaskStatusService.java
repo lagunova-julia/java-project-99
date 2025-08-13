@@ -16,6 +16,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+/**
+ * Сервис для работы со статусами задач.
+ */
 @Slf4j
 @Service
 public class TaskStatusService {
@@ -27,6 +30,10 @@ public class TaskStatusService {
     @Autowired
     private TaskRepository taskRepository;
 
+    /**
+     * Получает все статусы задач.
+     * @return список статусов задач
+     */
     public List<TaskStatusDTO> getAll() {
         log.info("Fetching all task statuses");
         var statuses = statusRepository.findAll();
@@ -37,6 +44,11 @@ public class TaskStatusService {
         return result;
     }
 
+    /**
+     * Создает новый статус задачи.
+     * @param statusData данные статуса
+     * @return созданный статус
+     */
     public TaskStatusDTO create(TaskStatusCreateDTO statusData) {
         log.info("Create called with data={}", statusData);
         var taskStatus = statusMapper.map(statusData);
@@ -46,6 +58,11 @@ public class TaskStatusService {
         return statusMapper.map(taskStatus);
     }
 
+    /**
+     * Находит статус по ID.
+     * @param id идентификатор статуса
+     * @return найденный статус
+     */
     public TaskStatusDTO findById(Long id) {
         log.info("findById called with id={}", id);
         var status = statusRepository.findById(id)
@@ -55,6 +72,12 @@ public class TaskStatusService {
         return statusMapper.map(status);
     }
 
+    /**
+     * Обновляет статус задачи.
+     * @param id идентификатор статуса
+     * @param statusData новые данные
+     * @return обновленный статус
+     */
     public TaskStatusDTO update(TaskStatusUpdateDTO statusData, Long id) {
         log.info("Update called with id={}, data={}", id, statusData);
         var status = statusRepository.findById(id)
@@ -68,6 +91,10 @@ public class TaskStatusService {
         return statusMapper.map(status);
     }
 
+    /**
+     * Удаляет статус задачи.
+     * @param id идентификатор статуса
+     */
     public void delete(Long id) throws ResponseStatusException {
         log.info("Delete called with id={}", id);
         TaskStatus taskStatus = statusRepository.findById(id)

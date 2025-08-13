@@ -6,8 +6,16 @@ import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
+/**
+ * Спецификация для фильтрации задач.
+ */
 @Component
 public class TaskSpecification {
+    /**
+     * Создает спецификацию для фильтрации.
+     * @param params параметры фильтрации
+     * @return спецификация
+     */
     public Specification<Task> build(TaskParamsDTO params) {
         return withAssigneeId(params.getAssigneeId())
                 .and(withTitleCont(params.getTitleCont()))
@@ -35,7 +43,9 @@ public class TaskSpecification {
 
     private Specification<Task> withLabelId(Long labelId) {
         return (root, query, cb) -> {
-            if(labelId == null) return null;
+            if (labelId == null) {
+                return null;
+            }
             query.distinct(true);
             Join<Task, ?> labels = root.join("labels");
             return cb.equal(labels.get("id"), labelId);
