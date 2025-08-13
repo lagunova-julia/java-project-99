@@ -3,7 +3,6 @@ package hexlet.code.controller.api.users;
 import hexlet.code.dto.user.UserCreateDTO;
 import hexlet.code.dto.user.UserDTO;
 import hexlet.code.dto.user.UserUpdateDTO;
-import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +25,6 @@ import java.util.List;
 
 /**
  * Контроллер для управления пользователями.
- * Предоставляет REST API для операций CRUD (создание, чтение, обновление, удаление) с пользователями.
- * Доступ к некоторым операциям ограничен в зависимости от роли пользователя.
- *
- * @see UserDTO
- * @see UserCreateDTO
- * @see UserUpdateDTO
  */
 @RestController
 @RequestMapping("/api/users")
@@ -40,11 +33,8 @@ public class UserController {
     private UserService userService;
 
     /**
-     * Возвращает список всех пользователей.
-     * Доступно только для пользователей с ролью ADMIN.
-     *
-     * @return список {@link UserDTO} всех пользователей
-     * @throws AccessDeniedException если у текущего пользователя нет прав ADMIN
+     * Возвращает всех пользователей.
+     * @return ResponseEntity со списком UserDTO и X-Total-Count в заголовках
      */
     @GetMapping(path = "")
 //    @PreAuthorize("hasRole('ADMIN')")
@@ -59,12 +49,8 @@ public class UserController {
 
     /**
      * Создает нового пользователя.
-     * Пароль пользователя хэшируется перед сохранением.
-     * Новому пользователю автоматически присваивается роль ROLE_USER.
-     *
-     * @param userData данные для создания пользователя ({@link UserCreateDTO})
-     * @return созданный пользователь в формате {@link UserDTO}
-     * @throws MethodArgumentNotValidException если данные пользователя не прошли валидацию
+     * @param userData данные для создания
+     * @return созданный UserDTO
      */
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
@@ -73,13 +59,9 @@ public class UserController {
     }
 
     /**
-     * Возвращает информацию о пользователе по его ID.
-     * Доступно для ADMIN или для самого пользователя (по principal.id).
-     *
+     * Возвращает пользователя по ID.
      * @param id ID пользователя
-     * @return данные пользователя в формате {@link UserDTO}
-     * @throws ResourceNotFoundException если пользователь не найден
-     * @throws AccessDeniedException если текущий пользователь не имеет доступа
+     * @return UserDTO
      */
     @GetMapping(path = "/{id}")
     @PreAuthorize("hasRole('ADMIN') or #id == principal.id")
@@ -89,15 +71,10 @@ public class UserController {
     }
 
     /**
-     * Обновляет данные пользователя по его ID.
-     * Доступно для ADMIN или для самого пользователя (по principal.id).
-     *
-     * @param userData новые данные пользователя ({@link UserUpdateDTO})
-     * @param id ID пользователя для обновления
-     * @return обновленные данные пользователя в формате {@link UserDTO}
-     * @throws ResponseStatusException если пользователь не найден (HTTP 404)
-     * @throws AccessDeniedException если текущий пользователь не имеет доступа
-     * @throws MethodArgumentNotValidException если данные не прошли валидацию
+     * Обновляет пользователя.
+     * @param id ID пользователя
+     * @param userData новые данные
+     * @return обновленный UserDTO
      */
     @PutMapping(path = "/{id}")
     @PreAuthorize("hasRole('ADMIN') or #id == principal.id")
@@ -107,12 +84,8 @@ public class UserController {
     }
 
     /**
-     * Удаляет пользователя по его ID.
-     * Доступно для ADMIN или для самого пользователя (по principal.id).
-     *
-     * @param id ID пользователя для удаления
-     * @throws ResponseStatusException если пользователь не найден (HTTP 404)
-     * @throws AccessDeniedException если текущий пользователь не имеет доступа
+     * Удаляет пользователя.
+     * @param id ID пользователя
      */
     @DeleteMapping(path = "/{id}")
     @PreAuthorize("hasRole('ADMIN') or #id == principal.id")

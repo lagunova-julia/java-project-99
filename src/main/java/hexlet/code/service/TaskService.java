@@ -53,8 +53,10 @@ public class TaskService {
     private TaskSpecification specBuilder;
 
     /**
-     * Возвращает все задачи.
-     * @return список задач
+     * Возвращает список задач с пагинацией и фильтрацией.
+     * @param params параметры фильтрации задач (может быть null)
+     * @param page номер страницы (начинается с 1)
+     * @return страница списка задач с учетом фильтрации
      */
     public List<TaskDTO> getAll(TaskParamsDTO params, @RequestParam(defaultValue = "1") int page) {
         log.info("Fetching all tasks");
@@ -68,8 +70,9 @@ public class TaskService {
     }
 
     /**
-     * Возвращает общее количество задач.
-     * @return количество задач
+     * Возвращает общее количество задач с учетом параметров фильтрации.
+     * @param params параметры фильтрации задач (может быть null)
+     * @return общее количество задач, удовлетворяющих критериям фильтрации
      */
     public Long getTotalCount(TaskParamsDTO params) {
         var spec = specBuilder.build(params);
