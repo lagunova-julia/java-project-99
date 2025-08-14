@@ -51,7 +51,10 @@ dependencies {
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
 	implementation("io.sentry:sentry-spring-boot-starter-jakarta:8.19.1")  // Для Spring Boot 3+
 	implementation("io.sentry:sentry-logback:8.19.1")  // Логирование
-	implementation("io.sentry:sentry-opentelemetry-agent:8.19.1")
+	implementation("io.sentry:sentry-jdbc:8.19.1")
+	implementation("io.sentry:sentry:8.19.1")
+
+	runtimeOnly("io.sentry:sentry-opentelemetry-agent:8.19.1")
 
 
 	testImplementation(platform("org.junit:junit-bom:5.10.0"))
