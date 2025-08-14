@@ -6,6 +6,7 @@ plugins {
 	id("io.spring.dependency-management") version "1.1.7"
 	id("org.sonarqube") version "6.2.0.5505"
 	id("io.freefair.lombok") version "8.6"
+//	id ("io.sentry.jvm.gradle") version "5.9.0"
 }
 
 group = "hexlet.code"
@@ -16,6 +17,13 @@ java {
 		languageVersion = JavaLanguageVersion.of(17)
 	}
 }
+
+//sentry {
+//	includeSourceContext = true
+//	org = "julia-ufimtseva"
+//	projectName = "java-spring-boot"
+//	authToken = System.getenv("SENTRY_AUTH_TOKEN")
+//}
 
 repositories {
 	mavenCentral()
@@ -31,6 +39,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-devtools")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
+	implementation("org.postgresql:postgresql:42.7.2")
 	runtimeOnly("com.h2database:h2")
 
 	implementation("org.springframework.boot:spring-boot-starter-security")
@@ -40,6 +49,8 @@ dependencies {
 	implementation("org.instancio:instancio-junit:3.3.0")
 
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
+//	implementation("io.sentry:sentry-opentelemetry-agent:8.19.1")
+//	implementation("io.sentry:sentry-spring-boot-starter-jakarta:7.11.1")
 
 	testImplementation(platform("org.junit:junit-bom:5.10.0"))
 	testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
@@ -70,3 +81,31 @@ sonar {
 		property("sonar.host.url", "https://sonarcloud.io")
 	}
 }
+
+//tasks.register<Copy>("copySentryAgent") {
+//	dependsOn(configurations.runtimeClasspath)
+//
+//	from({
+//		configurations.runtimeClasspath.get()
+//				.filter { it.name.startsWith("sentry-opentelemetry-agent") }
+//				.also {
+//					if (it.isEmpty()) {
+//						throw GradleException("Sentry agent JAR not found in dependencies!")
+//					}
+//				}
+//	})
+//
+//	into(layout.buildDirectory.dir("libs"))
+//}
+//
+//// 3. Привязываем копирование к сборке JAR
+//tasks.named("bootJar") {
+//	dependsOn("copySentryAgent")
+//}
+//
+//// 4. Для запуска через bootRun (опционально)
+//tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
+//	jvmArgs = listOf(
+//			"-javaagent:${layout.buildDirectory.get().asFile}/libs/sentry-opentelemetry-agent.jar"
+//	)
+//}
