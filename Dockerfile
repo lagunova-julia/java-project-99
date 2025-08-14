@@ -9,14 +9,14 @@ COPY gradlew .
 
 ARG SENTRY_AUTH_TOKEN
 
-ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
+# ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
 
 RUN ./gradlew --no-daemon dependencies
 
 COPY config config
 COPY src src
 
-RUN ./gradlew --no-daemon build
+RUN ./gradlew --no-daemon build -PsentryAuthToken=$SENTRY_AUTH_TOKEN
 
 EXPOSE 8080
 
