@@ -16,7 +16,7 @@ RUN ./gradlew --no-daemon dependencies
 COPY config config
 COPY src src
 
-RUN ./gradlew --no-daemon build -PsentryAuthToken=$SENTRY_AUTH_TOKEN
+RUN ./gradlew --no-daemon build
 
 EXPOSE 8080
 
