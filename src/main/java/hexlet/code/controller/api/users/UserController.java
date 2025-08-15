@@ -64,7 +64,7 @@ public class UserController {
      * @return UserDTO
      */
     @GetMapping(path = "/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #id == principal.id")
+//    @PreAuthorize("hasRole('ADMIN') or #id == principal.id")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO show(@PathVariable Long id) {
         return userService.show(id);

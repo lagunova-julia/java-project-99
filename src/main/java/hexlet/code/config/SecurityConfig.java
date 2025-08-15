@@ -63,6 +63,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/tasks/**").authenticated()
                         .requestMatchers("/api/labels").authenticated()
                         .requestMatchers("/api/labels/**").authenticated()
+                        .requestMatchers("/api/users").authenticated()
+                        .requestMatchers("/api/users/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/task_statuses",
                                 "/api/task_statuses/*").permitAll() //for show() and index() for now
                         .requestMatchers(HttpMethod.POST, "/api/task_statuses/**").authenticated()
