@@ -38,7 +38,7 @@ public class ModelGenerator {
 
         statusModel = Instancio.of(TaskStatus.class)
                 .ignore(Select.field(TaskStatus::getId))
-                .supply(Select.field(TaskStatus::getName), () -> faker.lorem().word())
+                .supply(Select.field(TaskStatus::getName), () -> faker.lorem().word() + "_" + UUID.randomUUID())
                 .supply(Select.field(TaskStatus::getSlug), () -> faker.lorem().word() + "-" + UUID.randomUUID())
                 .toModel();
 
