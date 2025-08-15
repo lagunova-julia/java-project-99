@@ -18,12 +18,12 @@ java {
 	}
 }
 
-sentry {
-	includeSourceContext = true
-	org = "julia-ufimtseva"
-	projectName = "java-spring-boot"
-	authToken = System.getenv("SENTRY_AUTH_TOKEN")
-}
+//sentry {
+//	includeSourceContext = true
+//	org = "julia-ufimtseva"
+//	projectName = "java-spring-boot"
+//	authToken = System.getenv("SENTRY_AUTH_TOKEN")
+//}
 
 repositories {
 	mavenCentral()

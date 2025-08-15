@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jdk
+FROM eclipse-temurin:21-jdk
 
 RUN apt-get update && apt-get install -yq make unzip
 
@@ -20,4 +20,4 @@ RUN ./gradlew --no-daemon build -PsentryAuthToken=$SENTRY_AUTH_TOKEN
 
 EXPOSE 8080
 
-CMD java -jar build/libs/demo-0.0.1-SNAPSHOT.jar
+CMD java -jar build/libs/app-0.0.1-SNAPSHOT.jar
