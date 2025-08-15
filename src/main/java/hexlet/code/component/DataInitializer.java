@@ -33,24 +33,13 @@ public final class DataInitializer implements ApplicationRunner {
         initLabels();
     }
 
-//    private void initAdmin() {
-//        String adminEmail = System.getenv("ADMIN_EMAIL");
-//        String adminPassword = System.getenv("ADMIN_PASSWORD");
-//        if (userRepository.findByEmail(adminEmail).isEmpty()) {
-//            User user = new User();
-//            user.setEmail(adminEmail);
-//            user.setPassword(passwordEncoder.encode(adminPassword));
-//            user.setRoles(Set.of("ROLE_ADMIN"));
-//
-//            userRepository.save(user);
-//        }
-//    }
-
     private void initAdmin() {
-        if (userRepository.findByEmail("hexlet@example.com").isEmpty()) {
+        String adminEmail = System.getenv("ADMIN_EMAIL");
+        String adminPassword = System.getenv("ADMIN_PASSWORD");
+        if (userRepository.findByEmail(adminEmail).isEmpty()) {
             User user = new User();
-            user.setEmail("hexlet@example.com");
-            user.setPassword(passwordEncoder.encode("qwerty"));
+            user.setEmail(adminEmail);
+            user.setPassword(passwordEncoder.encode(adminPassword));
             user.setRoles(Set.of("ROLE_ADMIN"));
 
             userRepository.save(user);
