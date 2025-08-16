@@ -26,6 +26,9 @@ public abstract class TaskMapper {
     @Mapping(source = "description", target = "content")
     @Mapping(source = "taskStatus.slug", target = "status")
     @Mapping(source = "assignee.id", target = "assigneeId")
+    @Mapping(target = "taskLabelIds",
+            expression = "java(task.getLabels().stream().map(Label::getId)"
+                    + ".collect(java.util.stream.Collectors.toSet()))")
     public abstract TaskDTO map(Task model);
 
     @Mapping(source = "title", target = "name")
