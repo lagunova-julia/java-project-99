@@ -112,7 +112,7 @@ public class UserService {
      */
     public Long getIdByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not fount with email: " + email))
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email))
                 .getId();
     }
 }

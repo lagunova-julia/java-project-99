@@ -52,7 +52,6 @@ public class TaskStatusService {
     public TaskStatusDTO create(TaskStatusCreateDTO statusData) {
         log.info("Create called with data={}", statusData);
         var taskStatus = statusMapper.map(statusData);
-//        taskStatus.setRoles(Set.of("ROLE_USER"));
         statusRepository.save(taskStatus);
         log.info("Create successful for data={}", statusData);
         return statusMapper.map(taskStatus);

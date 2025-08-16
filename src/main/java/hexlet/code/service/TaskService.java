@@ -109,7 +109,6 @@ public class TaskService {
         task.setTaskStatus(status);
         task.setAssignee(assignee);
         task.setLabels(labels);
-//        task.setRoles(Set.of("ROLE_USER"));
         Task saved = taskRepository.save(task);
         log.info("Create successful for data={}", taskData);
         return taskMapper.map(saved);

@@ -37,7 +37,6 @@ public class UserController {
      * @return ResponseEntity со списком UserDTO и X-Total-Count в заголовках
      */
     @GetMapping(path = "")
-//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserDTO>> index() {
         var users = userService.getAll();
 
@@ -64,7 +63,6 @@ public class UserController {
      * @return UserDTO
      */
     @GetMapping(path = "/{id}")
-//    @PreAuthorize("hasRole('ADMIN') or #id == principal.id")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO show(@PathVariable Long id) {
         return userService.show(id);

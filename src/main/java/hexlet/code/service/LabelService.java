@@ -52,7 +52,6 @@ public class LabelService {
         log.info("Create called with data={}", labelData);
 
         Label label = labelMapper.map(labelData);
-//        task.setRoles(Set.of("ROLE_USER"));
         Label saved = labelRepository.save(label);
 
         log.info("Create successful for data={}", labelData);
