@@ -88,7 +88,7 @@ public class UserController {
      * @param id ID пользователя
      */
     @DeleteMapping(path = "/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #id == principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #id == @userService.getIdByEmail(principal.claims['sub'])")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) throws ResponseStatusException {
         userService.delete(id);
