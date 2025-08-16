@@ -3,7 +3,6 @@
 
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=lagunova-julia_java-project-99&metric=coverage)](https://sonarcloud.io/summary/new_code?id=lagunova-julia_java-project-99)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=lagunova-julia_java-project-99&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=lagunova-julia_java-project-99)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=lagunova-julia_java-project-99&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=lagunova-julia_java-project-99)
 
 # Task Manager
 ### App:

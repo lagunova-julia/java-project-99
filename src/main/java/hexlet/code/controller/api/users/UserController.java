@@ -77,7 +77,7 @@ public class UserController {
      * @return обновленный UserDTO
      */
     @PutMapping(path = "/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #id == principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #id == @userService.getIdByEmail(principal.username)")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO update(@RequestBody @Valid UserUpdateDTO userData, @PathVariable Long id) {
         return userService.update(userData, id);
