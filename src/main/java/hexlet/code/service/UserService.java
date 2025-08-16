@@ -105,6 +105,11 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
+    /**
+     * Возвращает id пользователя по его email.
+     * @param email идентификатор пользователя
+     * @return id пользователя
+     */
     public Long getIdByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not fount with email: " + email))
