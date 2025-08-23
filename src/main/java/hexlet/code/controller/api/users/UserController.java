@@ -75,7 +75,8 @@ public class UserController {
      * @return обновленный UserDTO
      */
     @PutMapping(path = "/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #id == @userService.getIdByEmail(principal.claims['sub'])")
+//    @PreAuthorize("hasRole('ADMIN') or #id == @userService.getIdByEmail(principal.claims['sub'])")
+    @PreAuthorize("hasRole('ADMIN') or #id == @userService.getIdByEmail(authentication.name)")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO update(@RequestBody @Valid UserUpdateDTO userData, @PathVariable Long id) {
         return userService.update(userData, id);
@@ -86,7 +87,8 @@ public class UserController {
      * @param id ID пользователя
      */
     @DeleteMapping(path = "/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #id == @userService.getIdByEmail(principal.claims['sub'])")
+//    @PreAuthorize("hasRole('ADMIN') or #id == @userService.getIdByEmail(principal.claims['sub'])")
+    @PreAuthorize("hasRole('ADMIN') or #id == @userService.getIdByEmail(authentication.name)")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) throws ResponseStatusException {
         userService.delete(id);

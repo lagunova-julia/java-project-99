@@ -16,10 +16,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -31,6 +34,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.is;
 import static org.instancio.Select.field;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -208,5 +212,38 @@ class AppApplicationTests {
 
         mockMvc.perform(request)
                 .andExpect(status().isBadRequest());
+    }
+
+    //try to fix 500 server error
+    @Test
+    public void testDeleteUserByHimself() throws Exception {
+        userRepository.save(user);
+//        userRepository.save(admin);
+
+        mockMvc.perform(delete("/api/users/{id}", user.getId()).with(withMockJwt(user)))
+                .andExpect(status().isNoContent());
+
+        assertThat(userRepository.findById(user.getId())).isEmpty();
+    }
+
+    @Test
+    public void testDeleteOtherUser() throws Exception {
+        userRepository.save(user);
+//        userRepository.save(admin);
+
+        var user2 = Instancio.of(User.class)
+                .ignore(field(User::getId))
+                .set(field(User::getFirstName), "Billy")
+                .set(field(User::getLastName), "Smith")
+                .generate(field(User::getEmail), gen -> gen.net().email())
+                .supply(field(User::getPassword), () -> faker.internet().password())
+                .create();
+        user2.setRoles(Set.of("ROLE_USER"));
+        userRepository.save(user2);
+
+        mockMvc.perform(delete("/api/users/{id}", user2.getId()).with(withMockJwt(user)))
+                .andExpect(status().isForbidden());
+
+        assertThat(userRepository.findById(user2.getId())).isNotEmpty();
     }
 }
