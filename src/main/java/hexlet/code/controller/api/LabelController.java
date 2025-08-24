@@ -22,21 +22,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-/**
- * Контроллер для работы с метками.
- */
 @Slf4j
 @RestController
 @RequestMapping("/api/labels")
 @RequiredArgsConstructor
-public class LabelController {
-//    @Autowired
+public final class LabelController {
+
     private final LabelService labelService;
 
-    /**
-     * Возвращает список меток.
-     * @return список меток
-     */
     @GetMapping(path = "")
     public ResponseEntity<List<LabelDTO>> index() {
         var labels = labelService.getAll();
@@ -46,11 +39,6 @@ public class LabelController {
                 .body(labels);
     }
 
-    /**
-     * Создает новую метку.
-     * @param labelData данные метки
-     * @return созданная метка
-     */
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public LabelDTO create(@Valid @RequestBody LabelCreateDTO labelData) {
@@ -58,23 +46,12 @@ public class LabelController {
         return labelService.create(labelData);
     }
 
-    /**
-     * Возвращает метку по ID.
-     * @param id идентификатор метки
-     * @return найденная метка
-     */
     @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public LabelDTO show(@PathVariable Long id) {
         return labelService.findById(id);
     }
 
-    /**
-     * Обновляет метку.
-     * @param id идентификатор метки
-     * @param labelData новые данные
-     * @return обновленная метка
-     */
     @PutMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public LabelDTO update(@RequestBody @Valid LabelUpdateDTO labelData, @PathVariable Long id) {
@@ -82,10 +59,6 @@ public class LabelController {
         return labelService.update(labelData, id);
     }
 
-    /**
-     * Удаляет метку.
-     * @param id идентификатор метки
-     */
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) throws ResponseStatusException {

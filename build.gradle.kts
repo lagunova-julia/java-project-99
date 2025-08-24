@@ -18,12 +18,10 @@ java {
 	}
 }
 
-//sentry {
-//	includeSourceContext = true
-//	org = "julia-ufimtseva"
-//	projectName = "java-spring-boot"
-//	authToken = System.getenv("SENTRY_AUTH_TOKEN")
-//}
+checkstyle {
+	toolVersion = "10.12.4"
+	configFile = file("config/checkstyle/checkstyle.xml")
+}
 
 repositories {
 	mavenCentral()
@@ -55,7 +53,6 @@ dependencies {
 	implementation("io.sentry:sentry:8.19.1")
 
 	runtimeOnly("io.sentry:sentry-opentelemetry-agent:8.19.1")
-
 
 	testImplementation(platform("org.junit:junit-bom:5.10.0"))
 	testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
@@ -103,12 +100,12 @@ tasks.register<Copy>("copySentryAgent") {
 	into(layout.buildDirectory.dir("libs"))
 }
 
-// 3. Привязываем копирование к сборке JAR
+// Привязка копирования к сборке JAR
 tasks.named("bootJar") {
 	dependsOn("copySentryAgent")
 }
 
-// 4. Для запуска через bootRun (опционально)
+// Для запуска через bootRun (опционально)
 tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
 	jvmArgs = listOf(
 			"-javaagent:${layout.buildDirectory.get().asFile}/libs/sentry-opentelemetry-agent.jar"

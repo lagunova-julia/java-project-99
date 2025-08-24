@@ -30,35 +30,25 @@ import java.util.Set;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
-/**
- * Сервис для управления задачами.
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TaskService {
-//    @Autowired
+public final class TaskService {
+
     private final TaskRepository taskRepository;
-//    @Autowired
+
     private final TaskMapper taskMapper;
-//    @Autowired
+
     private final TaskStatusRepository statusRepository;
-//    @Autowired
+
     private final LabelRepository labelRepository;
-//    @Autowired
+
     private final UserRepository userRepository;
-//    @Autowired
+
     private final UserUtils userUtils;
 
-//    @Autowired
     private final TaskSpecification specBuilder;
 
-    /**
-     * Возвращает список задач с пагинацией и фильтрацией.
-     * @param params параметры фильтрации задач (может быть null)
-     * @param page номер страницы (начинается с 1)
-     * @return страница списка задач с учетом фильтрации
-     */
     public List<TaskDTO> getAll(TaskParamsDTO params, @RequestParam(defaultValue = "1") int page) {
         log.info("Fetching all tasks");
         var specification = specBuilder.build(params);
@@ -70,21 +60,11 @@ public class TaskService {
         return result;
     }
 
-    /**
-     * Возвращает общее количество задач с учетом параметров фильтрации.
-     * @param params параметры фильтрации задач (может быть null)
-     * @return общее количество задач, удовлетворяющих критериям фильтрации
-     */
     public Long getTotalCount(TaskParamsDTO params) {
         var spec = specBuilder.build(params);
         return taskRepository.count(spec);
     }
 
-    /**
-     * Создает новую задачу.
-     * @param taskData данные задачи
-     * @return созданная задача
-     */
     public TaskDTO create(TaskCreateDTO taskData) {
         log.info("Create called with data={}", taskData);
         TaskStatus status = statusRepository.findBySlug(taskData.getStatus())
@@ -115,11 +95,6 @@ public class TaskService {
         return taskMapper.map(saved);
     }
 
-    /**
-     * Находит задачу по ID.
-     * @param id идентификатор задачи
-     * @return найденная задача
-     */
     public TaskDTO findById(Long id) {
         log.info("findById called with id={}", id);
         var task = taskRepository.findById(id)
@@ -129,12 +104,6 @@ public class TaskService {
         return taskMapper.map(task);
     }
 
-    /**
-     * Обновляет задачу.
-     * @param id идентификатор задачи
-     * @param taskData новые данные
-     * @return обновленная задача
-     */
     public TaskDTO update(TaskUpdateDTO taskData, Long id) {
         log.info("Update called with id={}, data={}", id, taskData);
         var task = taskRepository.findById(id)
@@ -152,10 +121,6 @@ public class TaskService {
         return taskMapper.map(task);
     }
 
-    /**
-     * Удаляет задачу.
-     * @param id идентификатор задачи
-     */
     public void delete(Long id) throws ResponseStatusException {
         log.info("Delete called with id={}", id);
         Task task = taskRepository.findById(id)

@@ -19,29 +19,19 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Сервис для управления пользователями.
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserService {
-//    @Autowired
+public final class UserService {
+
     private final UserRepository userRepository;
 
-//    @Autowired
     private final UserMapper userMapper;
 
-//    @Autowired
     private final TaskRepository taskRepository;
 
-//    @Autowired
     private final PasswordEncoder passwordEncoder;
 
-    /**
-     * Возвращает всех пользователей.
-     * @return список пользователей
-     */
     public List<UserDTO> getAll() {
         var users = userRepository.findAll();
         var usersDTOs = users.stream()
@@ -50,11 +40,6 @@ public class UserService {
         return usersDTOs;
     }
 
-    /**
-     * Создает нового пользователя.
-     * @param userData данные пользователя
-     * @return созданный пользователь
-     */
     public UserDTO create(UserCreateDTO userData) {
         var user = userMapper.map(userData);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -63,11 +48,6 @@ public class UserService {
         return userMapper.map(user);
     }
 
-    /**
-     * Возвращает пользователя по ID.
-     * @param id идентификатор пользователя
-     * @return найденный пользователь
-     */
     public UserDTO show(Long id) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Not Found: " + id));
@@ -75,12 +55,6 @@ public class UserService {
         return userMapper.map(user);
     }
 
-    /**
-     * Обновляет данные пользователя.
-     * @param id идентификатор пользователя
-     * @param userData новые данные
-     * @return обновленный пользователь
-     */
     public UserDTO update(UserUpdateDTO userData, Long id) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User " + id + " not found"));
@@ -90,10 +64,6 @@ public class UserService {
         return userMapper.map(user);
     }
 
-    /**
-     * Удаляет пользователя.
-     * @param id идентификатор пользователя
-     */
     public void delete(Long id) throws ResponseStatusException {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User " + id + " not found"));
@@ -106,11 +76,6 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    /**
-     * Возвращает id пользователя по его email.
-     * @param email идентификатор пользователя
-     * @return id пользователя
-     */
     public Long getIdByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email))

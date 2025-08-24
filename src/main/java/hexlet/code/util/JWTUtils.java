@@ -16,10 +16,8 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public final class JWTUtils {
-//    @Autowired
     private final JwtEncoder encoder;
 
-//    @Autowired
     private final CustomUserDetailsService userDetailsService;
 
     public String generateToken(String username) {

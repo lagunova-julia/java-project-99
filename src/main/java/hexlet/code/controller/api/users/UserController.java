@@ -23,20 +23,13 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-/**
- * Контроллер для управления пользователями.
- */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
-public class UserController {
-//    @Autowired
+public final class UserController {
+
     private final UserService userService;
 
-    /**
-     * Возвращает всех пользователей.
-     * @return ResponseEntity со списком UserDTO и X-Total-Count в заголовках
-     */
     @GetMapping(path = "")
     public ResponseEntity<List<UserDTO>> index() {
         var users = userService.getAll();
@@ -47,48 +40,26 @@ public class UserController {
         return new ResponseEntity<>(users, headers, HttpStatus.OK);
     }
 
-    /**
-     * Создает нового пользователя.
-     * @param userData данные для создания
-     * @return созданный UserDTO
-     */
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDTO create(@Valid @RequestBody UserCreateDTO userData) {
         return userService.create(userData);
     }
 
-    /**
-     * Возвращает пользователя по ID.
-     * @param id ID пользователя
-     * @return UserDTO
-     */
     @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO show(@PathVariable Long id) {
         return userService.show(id);
     }
 
-    /**
-     * Обновляет пользователя.
-     * @param id ID пользователя
-     * @param userData новые данные
-     * @return обновленный UserDTO
-     */
     @PutMapping(path = "/{id}")
-//    @PreAuthorize("hasRole('ADMIN') or #id == @userService.getIdByEmail(principal.claims['sub'])")
     @PreAuthorize("hasRole('ADMIN') or #id == @userService.getIdByEmail(authentication.name)")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO update(@RequestBody @Valid UserUpdateDTO userData, @PathVariable Long id) {
         return userService.update(userData, id);
     }
 
-    /**
-     * Удаляет пользователя.
-     * @param id ID пользователя
-     */
     @DeleteMapping(path = "/{id}")
-//    @PreAuthorize("hasRole('ADMIN') or #id == @userService.getIdByEmail(principal.claims['sub'])")
     @PreAuthorize("hasRole('ADMIN') or #id == @userService.getIdByEmail(authentication.name)")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) throws ResponseStatusException {

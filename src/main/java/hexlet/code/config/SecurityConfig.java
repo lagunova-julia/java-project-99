@@ -25,20 +25,13 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    /** Декодер JWT-токенов. */
-//    @Autowired
+
     private final JwtDecoder jwtDecoder;
 
-    /** Кодировщик паролей. */
-//    @Autowired
     private final PasswordEncoder passwordEncoder;
 
-    /** Сервис пользовательских данных. */
-//    @Autowired
     private final CustomUserDetailsService userService;
 
-    /** Конвертер аутентификации JWT. */
-//    @Autowired
     private final CustomJwtAuthenticationConverter customJwtAuthenticationConverter;
 
     /**

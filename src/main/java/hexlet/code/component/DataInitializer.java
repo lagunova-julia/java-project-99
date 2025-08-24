@@ -16,6 +16,7 @@ import java.util.Set;
 @Component
 @RequiredArgsConstructor
 public final class DataInitializer implements ApplicationRunner {
+
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;

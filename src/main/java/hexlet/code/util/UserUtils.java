@@ -11,7 +11,6 @@ import org.springframework.web.server.ResponseStatusException;
 @Component
 @RequiredArgsConstructor
 public final class UserUtils {
-//    @Autowired
     private final UserRepository userRepository;
 
     public User getCurrentUser() {

@@ -16,24 +16,17 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-/**
- * Сервис для управления метками.
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class LabelService {
-//    @Autowired
+public final class LabelService {
+
     private final TaskRepository taskRepository;
-//    @Autowired
+
     private final LabelRepository labelRepository;
-//    @Autowired
+
     private final LabelMapper labelMapper;
 
-    /**
-     * Возвращает все метки.
-     * @return список меток
-     */
     public List<LabelDTO> getAll() {
         log.info("Fetching all tasks");
         var labels = labelRepository.findAll();
@@ -44,11 +37,6 @@ public class LabelService {
         return result;
     }
 
-    /**
-     * Создает новую метку.
-     * @param labelData данные метки
-     * @return созданная метка
-     */
     public LabelDTO create(LabelCreateDTO labelData) {
         log.info("Create called with data={}", labelData);
 
@@ -59,11 +47,6 @@ public class LabelService {
         return labelMapper.map(saved);
     }
 
-    /**
-     * Находит метку по ID.
-     * @param id идентификатор метки
-     * @return найденная метка
-     */
     public LabelDTO findById(Long id) {
         log.info("findById called with id={}", id);
         var label = labelRepository.findById(id)
@@ -73,12 +56,6 @@ public class LabelService {
         return labelMapper.map(label);
     }
 
-    /**
-     * Обновляет метку.
-     * @param id идентификатор метки
-     * @param labelData новые данные
-     * @return обновленная метка
-     */
     public LabelDTO update(LabelUpdateDTO labelData, Long id) {
         log.info("Update called with id={}, data={}", id, labelData);
         var label = labelRepository.findById(id)
@@ -91,10 +68,6 @@ public class LabelService {
         return labelMapper.map(label);
     }
 
-    /**
-     * Удаляет метку.
-     * @param id идентификатор метки
-     */
     public void delete(Long id) throws ResponseStatusException {
         log.info("Delete called with id={}", id);
         Label label = labelRepository.findById(id)

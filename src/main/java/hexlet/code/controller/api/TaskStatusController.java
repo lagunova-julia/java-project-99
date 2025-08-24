@@ -22,21 +22,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-/**
- * Контроллер для работы со статусами задач.
- */
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/task_statuses")
-public class TaskStatusController {
-//    @Autowired
+public final class TaskStatusController {
+
     private final TaskStatusService statusService;
 
-    /**
-     * Возвращает список статусов.
-     * @return список статусов
-     */
     @GetMapping(path = "")
     public ResponseEntity<List<TaskStatusDTO>> index() {
         var statuses = statusService.getAll();
@@ -46,11 +39,6 @@ public class TaskStatusController {
                 .body(statuses);
     }
 
-    /**
-     * Создает новый статус.
-     * @param taskStatusData данные статуса
-     * @return созданный статус
-     */
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public TaskStatusDTO create(@Valid @RequestBody TaskStatusCreateDTO taskStatusData) {
@@ -58,23 +46,12 @@ public class TaskStatusController {
         return statusService.create(taskStatusData);
     }
 
-    /**
-     * Возвращает статус по ID.
-     * @param id идентификатор статуса
-     * @return найденный статус
-     */
     @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public TaskStatusDTO show(@PathVariable Long id) {
         return statusService.findById(id);
     }
 
-    /**
-     * Обновляет статус.
-     * @param id идентификатор статуса
-     * @param taskStatusData новые данные
-     * @return обновленный статус
-     */
     @PutMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public TaskStatusDTO update(@RequestBody @Valid TaskStatusUpdateDTO taskStatusData, @PathVariable Long id) {
@@ -82,10 +59,6 @@ public class TaskStatusController {
         return statusService.update(taskStatusData, id);
     }
 
-    /**
-     * Удаляет статус.
-     * @param id идентификатор статуса
-     */
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) throws ResponseStatusException {
