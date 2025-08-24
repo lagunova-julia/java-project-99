@@ -8,6 +8,7 @@ import hexlet.code.mapper.LabelMapper;
 import hexlet.code.model.Label;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,13 +22,14 @@ import java.util.List;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class LabelService {
-    @Autowired
-    private TaskRepository taskRepository;
-    @Autowired
-    private LabelRepository labelRepository;
-    @Autowired
-    private LabelMapper labelMapper;
+//    @Autowired
+    private final TaskRepository taskRepository;
+//    @Autowired
+    private final LabelRepository labelRepository;
+//    @Autowired
+    private final LabelMapper labelMapper;
 
     /**
      * Возвращает все метки.

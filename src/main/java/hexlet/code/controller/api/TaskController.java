@@ -8,6 +8,7 @@ import hexlet.code.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,9 +34,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/tasks")
 @Tag(name = "Task API")
+@RequiredArgsConstructor
 public class TaskController {
-    @Autowired
-    private TaskService taskService;
+//    @Autowired
+    private final TaskService taskService;
 
     /**
      * Возвращает список задач с возможностью фильтрации.

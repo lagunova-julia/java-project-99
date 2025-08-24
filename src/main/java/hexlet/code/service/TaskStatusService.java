@@ -8,6 +8,7 @@ import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,14 +22,15 @@ import java.util.List;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class TaskStatusService {
-    @Autowired
-    private TaskStatusRepository statusRepository;
+//    @Autowired
+    private final TaskStatusRepository statusRepository;
 
-    @Autowired
-    private TaskStatusMapper statusMapper;
-    @Autowired
-    private TaskRepository taskRepository;
+//    @Autowired
+    private final TaskStatusMapper statusMapper;
+//    @Autowired
+    private final TaskRepository taskRepository;
 
     /**
      * Получает все статусы задач.

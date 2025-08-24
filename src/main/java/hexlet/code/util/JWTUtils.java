@@ -1,6 +1,7 @@
 package hexlet.code.util;
 
 import hexlet.code.service.CustomUserDetailsService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,12 +15,13 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public final class JWTUtils {
-    @Autowired
-    private JwtEncoder encoder;
+//    @Autowired
+    private final JwtEncoder encoder;
 
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
+//    @Autowired
+    private final CustomUserDetailsService userDetailsService;
 
     public String generateToken(String username) {
         Instant now = Instant.now();

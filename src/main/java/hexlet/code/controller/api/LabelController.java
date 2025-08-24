@@ -5,6 +5,7 @@ import hexlet.code.dto.label.LabelDTO;
 import hexlet.code.dto.label.LabelUpdateDTO;
 import hexlet.code.service.LabelService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,9 +29,10 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/api/labels")
+@RequiredArgsConstructor
 public class LabelController {
-    @Autowired
-    private LabelService labelService;
+//    @Autowired
+    private final LabelService labelService;
 
     /**
      * Возвращает список меток.

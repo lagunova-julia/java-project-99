@@ -16,6 +16,7 @@ import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.specification.TaskSpecification;
 import hexlet.code.util.UserUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,22 +36,23 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class TaskService {
-    @Autowired
-    private TaskRepository taskRepository;
-    @Autowired
-    private TaskMapper taskMapper;
-    @Autowired
-    private TaskStatusRepository statusRepository;
-    @Autowired
-    private LabelRepository labelRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private UserUtils userUtils;
+//    @Autowired
+    private final TaskRepository taskRepository;
+//    @Autowired
+    private final TaskMapper taskMapper;
+//    @Autowired
+    private final TaskStatusRepository statusRepository;
+//    @Autowired
+    private final LabelRepository labelRepository;
+//    @Autowired
+    private final UserRepository userRepository;
+//    @Autowired
+    private final UserUtils userUtils;
 
-    @Autowired
-    private TaskSpecification specBuilder;
+//    @Autowired
+    private final TaskSpecification specBuilder;
 
     /**
      * Возвращает список задач с пагинацией и фильтрацией.

@@ -3,6 +3,7 @@ package hexlet.code.config;
 import hexlet.code.config.security.CustomJwtAuthenticationConverter;
 import hexlet.code.service.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,22 +24,23 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
     /** Декодер JWT-токенов. */
-    @Autowired
-    private JwtDecoder jwtDecoder;
+//    @Autowired
+    private final JwtDecoder jwtDecoder;
 
     /** Кодировщик паролей. */
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+//    @Autowired
+    private final PasswordEncoder passwordEncoder;
 
     /** Сервис пользовательских данных. */
-    @Autowired
-    private CustomUserDetailsService userService;
+//    @Autowired
+    private final CustomUserDetailsService userService;
 
     /** Конвертер аутентификации JWT. */
-    @Autowired
-    private CustomJwtAuthenticationConverter customJwtAuthenticationConverter;
+//    @Autowired
+    private final CustomJwtAuthenticationConverter customJwtAuthenticationConverter;
 
     /**
      * Настраивает цепочку безопасности.
